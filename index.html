@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101110">
+<meta name="color-scheme" content="dark">
+<title>The Great Guinness Crawl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one phone-width column; sticky header with tabs; four stacked cards. Dark pub, single theme by design. */
+:root {
+  --bg: #101110;
+  --card: #1C1D1A;
+  --gold: #D5AD55;
+  --burgundy: #702D32;
+  --cream: #F3EBDD;
+  --gray: #999991;
+  --olive: #687B51;
+  --line: #343630;
+  --ink: #101110;
+  --serif: "Cormorant Garamond", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+[hidden] { display: none !important; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3 { margin: 0; font-family: var(--serif); font-weight: 600; text-wrap: balance; }
+.eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gray);
+}
+.wrap {
+  max-width: 520px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Opening screen ---------- */
+.welcome {
+  min-height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  padding-block: calc(40px + env(safe-area-inset-top, 0px)) calc(40px + env(safe-area-inset-bottom, 0px));
+  gap: 28px;
+}
+.welcome h1 {
+  font-size: clamp(40px, 11vw, 56px); line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cream);
+}
+.welcome h1 .gold { color: var(--gold); }
+.tagline { font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gray); font-weight: 500; }
+.pint { width: 120px; height: auto; max-width: 100%; }
+.rule { width: 48px; height: 1px; background: var(--gold); opacity: .7; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 54px; padding: 0 28px; border-radius: 999px; border: 1px solid transparent;
+  font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; font-size: 13px;
+  transition: transform .12s ease, filter .12s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { filter: brightness(1.05); }
+.btn-ghost { background: transparent; color: var(--cream); border-color: var(--line); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn:focus-visible, .circle:focus-visible, .tab:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--gold); outline-offset: 2px;
+}
+
+/* ---------- Name screen ---------- */
+.name-screen { min-height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 22px;
+  padding-block: calc(40px + env(safe-area-inset-top, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)); }
+.name-screen h2 { font-size: 34px; line-height: 1.05; color: var(--cream); }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gray); font-weight: 600; }
+.input {
+  width: 100%; min-height: 54px; padding: 0 16px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line); color: var(--cream); font-size: 18px;
+}
+.input::placeholder { color: var(--gray); opacity: .8; }
+.input:focus { border-color: var(--gold); outline: none; }
+.hint { color: var(--gray); font-size: 13px; }
+.error { color: #E0A0A4; font-size: 13px; }
+
+/* ---------- App shell ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner { display: flex; flex-direction: column; gap: 10px; padding-block: 12px 0; }
+.brand { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.brand h1 { font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand h1 span { color: var(--gold); }
+.who { font-size: 12px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+.who button { background: none; border: 0; padding: 0; color: var(--gray); text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
+.who button:hover { color: var(--cream); }
+.tabs { display: flex; gap: 4px; }
+.tab {
+  flex: 1; background: none; border: 0; padding: 10px 4px 12px; position: relative;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gray);
+  white-space: nowrap;
+}
+.tab[aria-selected="true"] { color: var(--gold); }
+.tab[aria-selected="true"]::after { content: ""; position: absolute; left: 10%; right: 10%; bottom: -1px; height: 2px; background: var(--gold); border-radius: 2px; }
+.tab .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); margin-left: 6px; vertical-align: middle; }
+main { padding-block: 18px calc(40px + env(safe-area-inset-bottom, 0px)); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.conn { display: none; align-items: center; gap: 8px; font-size: 12px; color: var(--gray); padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+.conn.show { display: flex; }
+.conn .b { width: 8px; height: 8px; border-radius: 50%; background: var(--burgundy); }
+
+/* ---------- Scorecard cards ---------- */
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px 18px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.card-head .l { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.card-head h2 { font-size: 28px; line-height: 1.05; color: var(--cream); }
+.status {
+  flex: none; font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--gray); margin-top: 2px;
+}
+.status.rated { background: var(--olive); border-color: var(--olive); color: var(--cream); }
+.circles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.circle {
+  aspect-ratio: 1; width: 100%; max-width: 64px; margin: 0 auto;
+  border-radius: 50%; border: 1px solid var(--line); background: var(--bg); color: var(--gray);
+  font-weight: 600; font-size: 17px; font-variant-numeric: tabular-nums;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .14s cubic-bezier(.2,.8,.3,1.4), background-color .14s ease, color .14s ease, border-color .14s ease;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.circle:hover { border-color: var(--gray); color: var(--cream); }
+.circle[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--ink); font-weight: 700; }
+.circle.pop { animation: pop .32s cubic-bezier(.2,.8,.3,1.4); }
+@keyframes pop { 0% { transform: scale(.9) } 55% { transform: scale(1.14) } 100% { transform: scale(1) } }
+.save-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 18px; }
+.save { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gray); }
+.save.saved { color: var(--gold); }
+.save.saving { color: var(--gray); }
+.save.retrying { color: #D9A3A7; }
+.save.error { color: #D9A3A7; }
+.save svg { width: 14px; height: 14px; }
+.score-big { font-family: var(--serif); font-size: 22px; color: var(--gold); font-weight: 600; font-variant-numeric: tabular-nums; }
+.score-big small { font-family: var(--sans); font-size: 11px; color: var(--gray); letter-spacing: 0.1em; margin-left: 2px; }
+.note { display: flex; flex-direction: column; gap: 6px; }
+.note textarea {
+  width: 100%; min-height: 44px; resize: vertical; padding: 10px 12px; border-radius: 12px;
+  background: var(--bg); border: 1px solid var(--line); color: var(--cream); font-size: 14px; line-height: 1.4;
+}
+.note textarea::placeholder { color: var(--gray); opacity: .75; }
+.note textarea:focus { border-color: var(--gold); outline: none; }
+.note .meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray); letter-spacing: 0.06em; }
+
+/* ---------- Leaderboard ---------- */
+.section { display: flex; flex-direction: column; gap: 10px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.section-head h2 { font-size: 24px; color: var(--cream); }
+.section-head .eyebrow { font-size: 10.5px; }
+.rows { display: flex; flex-direction: column; gap: 8px; }
+.row {
+  display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px;
+}
+.row.leader { border-color: var(--gold); box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 35%, transparent), 0 8px 30px -18px var(--gold); }
+.rank { font-family: var(--serif); font-size: 22px; color: var(--gray); font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
+.leader .rank { color: var(--gold); }
+.row .name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.row .name b { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--cream); line-height: 1.1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.row .name b span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .name small { font-size: 11.5px; color: var(--gray); letter-spacing: 0.04em; }
+.trophy { width: 18px; height: 18px; flex: none; color: var(--gold); }
+.avg { text-align: right; font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--cream); font-variant-numeric: tabular-nums; line-height: 1; }
+.leader .avg { color: var(--gold); }
+.avg small { display: block; font-family: var(--sans); font-size: 10.5px; color: var(--gray); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+.avg.na { color: var(--gray); font-size: 20px; }
+.empty { color: var(--gray); font-size: 13px; padding: 10px 2px; }
+.live { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gray); font-weight: 600; }
+.live i { width: 7px; height: 7px; border-radius: 50%; background: var(--olive); display: inline-block; }
+.live.off i { background: var(--burgundy); }
+
+/* ---------- Results ---------- */
+.results { display: flex; flex-direction: column; gap: 18px; }
+.hero {
+  position: relative; overflow: hidden; text-align: center;
+  background: linear-gradient(180deg, #23231F 0%, var(--card) 100%);
+  border: 1px solid var(--gold); border-radius: 24px; padding: 28px 18px 26px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.hero .eyebrow { color: var(--gold); }
+.hero h2 { font-size: 40px; line-height: 1; color: var(--cream); }
+.hero .big { font-family: var(--serif); font-size: 64px; line-height: 1; color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.hero .sub { color: var(--gray); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; }
+.hero .trophy-big { width: 44px; height: 44px; color: var(--gold); }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.panel .eyebrow { color: var(--gold); }
+.pint-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; border-top: 1px solid var(--line); padding-top: 10px; }
+.pint-line:first-of-type { border-top: 0; padding-top: 0; }
+.pint-line b { font-family: var(--serif); font-size: 20px; font-weight: 600; }
+.pint-line .at { color: var(--gray); font-size: 12.5px; }
+.pint-line .sc { font-family: var(--serif); font-size: 24px; color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.quote { color: var(--gray); font-size: 13px; font-style: italic; margin: 2px 0 0; }
+.confetti { position: absolute; inset: 0; pointer-events: none; }
+.waiting { text-align: center; color: var(--gray); padding: 40px 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.waiting .pint { width: 70px; opacity: .8; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+@media (min-width: 560px) {
+  .circle { max-width: 56px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Pint glass + trophy + check symbols (original drawings) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="pint-glass" viewBox="0 0 120 180">
+      <path d="M22 30 C22 24 26 20 32 20 L88 20 C94 20 98 24 98 30 L96 70 C94 100 102 120 100 150 C99 162 90 170 78 170 L42 170 C30 170 21 162 20 150 C18 120 26 100 24 70 Z" fill="#141513" stroke="#D5AD55" stroke-opacity=".55" stroke-width="1.5"/>
+      <path d="M26 48 L94 48 L96 70 C94 100 102 120 100 150 C99 162 90 170 78 170 L42 170 C30 170 21 162 20 150 C18 120 26 100 24 70 Z" fill="#0B0C0B"/>
+      <path d="M24 30 C24 24 28 22 33 22 L87 22 C92 22 96 24 96 30 L95 46 C94 50 90 52 86 50 C80 46 72 54 66 50 C60 46 54 56 46 50 C40 46 30 52 25 46 Z" fill="#F3EBDD"/>
+      <path d="M34 60 L31 150" stroke="#F3EBDD" stroke-opacity=".12" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="60" cy="172" rx="34" ry="5" fill="#000" opacity=".35"/>
+    </symbol>
+    <symbol id="trophy" viewBox="0 0 24 24">
+      <path d="M7 3h10v3h3v2c0 2.8-2 5.1-4.6 5.8A5.5 5.5 0 0 1 13 17.9V20h3v1.5H8V20h3v-2.1a5.5 5.5 0 0 1-2.4-4.1C6 13.1 4 10.8 4 8V6h3V3zm10 4.5V6h1.5v2c0 1.7-1 3.1-2.5 3.7.6-1.1 1-2.5 1-4.2zM7 6H5.5v2c0 1.7 1 3.1 2.5 3.7-.6-1.1-1-2.5-1-4.2z" fill="currentColor"/>
+    </symbol>
+    <symbol id="check" viewBox="0 0 24 24">
+      <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ===== Opening screen ===== -->
+<section id="view-welcome" class="wrap welcome">
+  <svg class="pint" viewBox="0 0 120 180" aria-hidden="true"><use href="#pint-glass"/></svg>
+  <div class="rule"></div>
+  <h1>The Great<br><span class="gold">Guinness</span><br>Crawl</h1>
+  <p class="tagline">Four bars. Four pints. One winner.</p>
+  <button id="btn-start" class="btn btn-gold" type="button">Start your scorecard</button>
+  <p id="welcome-error" class="error" hidden></p>
+</section>
+
+<!-- ===== Name entry ===== -->
+<section id="view-name" class="wrap name-screen" hidden>
+  <p class="eyebrow">Your scorecard</p>
+  <h2>Who's drinking?</h2>
+  <form id="name-form" class="field" autocomplete="off">
+    <label for="name-input">Name or nickname</label>
+    <input id="name-input" class="input" type="text" maxlength="40" placeholder="e.g. Toby" required autocapitalize="words" enterkeyhint="go">
+    <p class="hint">This is how you'll appear on the group leaderboard. You can change it later.</p>
+    <p id="name-error" class="error" hidden></p>
+    <button id="btn-name" class="btn btn-gold" type="submit">Start rating</button>
+  </form>
+</section>
+
+<!-- ===== App ===== -->
+<div id="view-app" hidden>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <h1>The Great <span>Guinness</span> Crawl</h1>
+        <div class="who"><span id="who-name"></span> · <button id="btn-rename" type="button">change</button></div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button class="tab" role="tab" id="tab-scorecard" aria-selected="true" aria-controls="panel-scorecard" type="button">My scorecard</button>
+        <button class="tab" role="tab" id="tab-leaderboard" aria-selected="false" aria-controls="panel-leaderboard" type="button">Group leaderboard</button>
+        <button class="tab" role="tab" id="tab-results" aria-selected="false" aria-controls="panel-results" type="button" hidden>Results<span class="dot"></span></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="conn" class="conn"><span class="b"></span><span id="conn-text">No connection. Your scores are queued and will save automatically.</span></div>
+
+    <section id="panel-scorecard" role="tabpanel" aria-labelledby="tab-scorecard" class="stack"></section>
+
+    <section id="panel-leaderboard" role="tabpanel" aria-labelledby="tab-leaderboard" class="stack" hidden>
+      <div class="section">
+        <div class="section-head"><h2>Bar rankings</h2><span id="live-pill" class="live"><i></i>Live</span></div>
+        <div id="bars-rows" class="rows"></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h2>Critics</h2><span class="eyebrow">Avg across rated bars</span></div>
+        <div id="people-rows" class="rows"></div>
+      </div>
+    </section>
+
+    <section id="panel-results" role="tabpanel" aria-labelledby="tab-results" class="results" hidden></section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.90.0/dist/umd/supabase.min.js"></script>
+<script>
+/* ============================================================
+   Configuration. The publishable key is public by design;
+   Row Level Security in the database is what protects the data.
+   ============================================================ */
+const SUPABASE_URL = "https://fvalchrpiuxgkmufgmzg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GTkHds_s0hxu0bfOuMmi2Q_wGqxyDzH";
+
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const fmt1 = (n) => (n == null ? '—' : Number(n).toFixed(1));
+
+  if (!window.supabase || SUPABASE_URL.startsWith('__')) {
+    $('welcome-error').textContent = 'This page is not configured yet (missing Supabase settings).';
+    $('welcome-error').hidden = false;
+    return;
+  }
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'ggc-participant' },
+  });
+
+  // ---------- state ----------
+  const state = {
+    userId: null,
+    participant: null,          // {id, display_name}
+    bars: [],                   // ordered by stop_number
+    ratings: new Map(),         // bar_id -> {score, comment}
+    saveState: new Map(),       // bar_id -> idle|saving|saved|retrying|error
+    pending: new Map(),         // bar_id -> {score, comment}
+    flushing: false,
+    backoff: 1000,
+    online: navigator.onLine !== false,
+    tab: 'scorecard',
+    revealed: false,
+    results: null,
+    leaderboard: { bars: [], people: [] },
+  };
+
+  // ---------- view switching ----------
+  const views = ['view-welcome', 'view-name', 'view-app'];
+  function show(id) { views.forEach((v) => { $(v).hidden = v !== id; }); window.scrollTo(0, 0); }
+
+  function setTab(name) {
+    state.tab = name;
+    ['scorecard', 'leaderboard', 'results'].forEach((t) => {
+      $('tab-' + t).setAttribute('aria-selected', String(t === name));
+      $('panel-' + t).hidden = t !== name;
+    });
+    try { localStorage.setItem('ggc-tab', name); } catch (_) {}
+    if (name === 'leaderboard' || name === 'results') refreshAggregates();
+  }
+  $('tab-scorecard').onclick = () => setTab('scorecard');
+  $('tab-leaderboard').onclick = () => setTab('leaderboard');
+  $('tab-results').onclick = () => setTab('results');
+
+  // ---------- auth / identity ----------
+  async function ensureSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) return session;
+    const { data, error } = await sb.auth.signInAnonymously();
+    if (error) throw error;
+    return data.session;
+  }
+
+  async function loadParticipant() {
+    const { data, error } = await sb.from('participants').select('id, display_name').eq('auth_user_id', state.userId).maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
+  async function boot() {
+    try {
+      const session = await ensureSessionQuiet();
+      if (session) {
+        state.userId = session.user.id;
+        const p = await loadParticipant();
+        if (p) { state.participant = p; await enterApp(); return; }
+      }
+    } catch (e) { console.warn('boot', e); }
+    show('view-welcome');
+  }
+  // On first open we don't sign in until the user taps START; returning devices already have a session.
+  async function ensureSessionQuiet() {
+    const { data: { session } } = await sb.auth.getSession();
+    return session;
+  }
+
+  $('btn-start').onclick = async () => {
+    const btn = $('btn-start'); btn.disabled = true; $('welcome-error').hidden = true;
+    try {
+      const session = await ensureSession();
+      state.userId = session.user.id;
+      const p = await loadParticipant();
+      if (p) { state.participant = p; await enterApp(); }
+      else { show('view-name'); setTimeout(() => $('name-input').focus(), 50); }
+    } catch (e) {
+      $('welcome-error').textContent = friendlyError(e, 'Could not start. Check your connection and try again.');
+      $('welcome-error').hidden = false;
+    } finally { btn.disabled = false; }
+  };
+
+  $('name-form').onsubmit = async (ev) => {
+    ev.preventDefault();
+    const name = $('name-input').value.trim();
+    const err = $('name-error'); err.hidden = true;
+    if (!name) { err.textContent = 'Enter a name or nickname.'; err.hidden = false; return; }
+    $('btn-name').disabled = true;
+    try {
+      if (!state.userId) { const s = await ensureSession(); state.userId = s.user.id; }
+      const { data, error } = await sb.from('participants')
+        .upsert({ auth_user_id: state.userId, display_name: name }, { onConflict: 'auth_user_id' })
+        .select('id, display_name').single();
+      if (error) throw error;
+      state.participant = data;
+      await enterApp();
+    } catch (e) {
+      err.textContent = friendlyError(e, 'Could not save your name. Try again.');
+      err.hidden = false;
+    } finally { $('btn-name').disabled = false; }
+  };
+
+  $('btn-rename').onclick = () => {
+    $('name-input').value = state.participant?.display_name || '';
+    $('btn-name').textContent = 'Save name';
+    show('view-name');
+    setTimeout(() => $('name-input').select(), 50);
+  };
+
+  function friendlyError(e, fallback) {
+    const m = (e && (e.message || e.error_description)) || '';
+    if (/anonymous sign-ins are disabled/i.test(m)) return 'Setup problem: anonymous sign-ins are turned off in Supabase.';
+    if (/fetch/i.test(m) || !state.online) return 'No connection. Check your signal and try again.';
+    return m ? `${fallback} (${m})` : fallback;
+  }
+
+  // ---------- app ----------
+  async function enterApp() {
+    $('who-name').textContent = state.participant.display_name;
+    show('view-app');
+    await loadBars();
+    await loadMyRatings();
+    renderScorecard();
+    let t = 'scorecard';
+    try { t = localStorage.getItem('ggc-tab') || 'scorecard'; } catch (_) {}
+    if (t === 'results' && !state.revealed) t = 'scorecard';
+    setTab(t);
+    await refreshAggregates();
+    startRealtime();
+  }
+
+  async function loadBars() {
+    const { data, error } = await sb.from('bars').select('id, name, stop_number').order('stop_number');
+    if (error) throw error;
+    state.bars = data || [];
+  }
+  async function loadMyRatings() {
+    const { data, error } = await sb.from('ratings').select('bar_id, score, comment').eq('participant_id', state.participant.id);
+    if (error) throw error;
+    state.ratings = new Map((data || []).map((r) => [r.bar_id, { score: r.score, comment: r.comment || '' }]));
+    for (const [barId] of state.ratings) state.saveState.set(barId, 'saved');
+  }
+
+  // ---------- scorecard rendering ----------
+  function renderScorecard() {
+    const root = $('panel-scorecard');
+    root.innerHTML = state.bars.map((b) => {
+      const r = state.ratings.get(b.id);
+      const sel = r?.score ?? null;
+      const circles = Array.from({ length: 10 }, (_, i) => i + 1).map((n) =>
+        `<button class="circle" type="button" data-bar="${b.id}" data-score="${n}" aria-pressed="${sel === n}" aria-label="Rate ${esc(b.name)} ${n} out of 10">${n}</button>`
+      ).join('');
+      return `
+      <article class="card" data-card="${b.id}">
+        <div class="card-head">
+          <div class="l">
+            <span class="eyebrow">Stop ${b.stop_number} of ${state.bars.length}</span>
+            <h2>${esc(b.name)}</h2>
+          </div>
+          <span class="status ${sel ? 'rated' : ''}" data-status>${sel ? 'Rated' : 'Not rated'}</span>
+        </div>
+        <div class="circles" role="group" aria-label="Rating out of 10">${circles}</div>
+        <div class="save-row">
+          <span class="save" data-save></span>
+          <span class="score-big" data-score-big ${sel ? '' : 'hidden'}>${sel ?? ''}<small>/ 10</small></span>
+        </div>
+        <div class="note">
+          <textarea id="note-${b.id}" data-note="${b.id}" maxlength="280" rows="2" placeholder="Tasting note (optional)">${esc(r?.comment || '')}</textarea>
+          <div class="meta"><span data-note-hint>${sel ? 'Saved with your score' : 'Pick a score to save your note'}</span><span data-count>${(r?.comment || '').length}/280</span></div>
+        </div>
+      </article>`;
+    }).join('');
+
+    root.querySelectorAll('.circle').forEach((btn) => {
+      btn.addEventListener('click', () => onRate(btn.dataset.bar, Number(btn.dataset.score), btn));
+    });
+    root.querySelectorAll('textarea[data-note]').forEach((ta) => {
+      let timer = null;
+      ta.addEventListener('input', () => {
+        const card = ta.closest('.card');
+        card.querySelector('[data-count]').textContent = `${ta.value.length}/280`;
+        clearTimeout(timer);
+        timer = setTimeout(() => onComment(ta.dataset.note, ta.value), 700);
+      });
+      ta.addEventListener('blur', () => { clearTimeout(timer); onComment(ta.dataset.note, ta.value); });
+    });
+    for (const b of state.bars) paintSave(b.id);
+  }
+
+  function onRate(barId, score, btn) {
+    const card = document.querySelector(`[data-card="${barId}"]`);
+    card.querySelectorAll('.circle').forEach((c) => c.setAttribute('aria-pressed', String(c === btn)));
+    btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+    const prev = state.ratings.get(barId) || { score: null, comment: '' };
+    const comment = card.querySelector('textarea').value.trim();
+    const next = { score, comment };
+    state.ratings.set(barId, next);
+    card.querySelector('[data-status]').textContent = 'Rated';
+    card.querySelector('[data-status]').classList.add('rated');
+    const big = card.querySelector('[data-score-big]'); big.hidden = false; big.innerHTML = `${score}<small>/ 10</small>`;
+    card.querySelector('[data-note-hint]').textContent = 'Saved with your score';
+    if (prev.score === score && prev.comment === comment && state.saveState.get(barId) === 'saved') { paintSave(barId); return; }
+    enqueue(barId, next);
+  }
+
+  function onComment(barId, text) {
+    const comment = text.trim().slice(0, 280);
+    const r = state.ratings.get(barId);
+    if (!r || r.score == null) return;            // no score yet: keep it in the box, never block
+    if (r.comment === comment) return;
+    r.comment = comment;
+    enqueue(barId, { score: r.score, comment });
+  }
+
+  // ---------- save queue (optimistic, coalesced per bar, auto-retry) ----------
+  function enqueue(barId, payload) {
+    state.pending.set(barId, { ...payload });
+    state.saveState.set(barId, 'saving');
+    paintSave(barId);
+    flush();
+  }
+
+  function isPermanent(err) {
+    // PostgREST / Postgres errors carry a code; network failures don't.
+    return !!(err && err.code && !/^(PGRST301|PGRST000|08|57|53)/.test(String(err.code)));
+  }
+
+  async function flush() {
+    if (state.flushing) return;
+    state.flushing = true;
+    try {
+      while (state.pending.size) {
+        const [barId, payload] = state.pending.entries().next().value;
+        state.pending.delete(barId);
+        state.saveState.set(barId, 'saving'); paintSave(barId);
+        try {
+          const row = { participant_id: state.participant.id, bar_id: barId, score: payload.score, comment: payload.comment || null };
+          const { error } = await sb.from('ratings').upsert(row, { onConflict: 'participant_id,bar_id' });
+          if (error) throw error;
+          if (!state.pending.has(barId)) { state.saveState.set(barId, 'saved'); paintSave(barId); }
+          state.backoff = 1000; setOnline(true);
+        } catch (e) {
+          console.warn('save failed', e);
+          if (isPermanent(e)) {
+            if (String(e.code) === '42501' || /JWT|token/i.test(e.message || '')) {
+              // Session problem: try to re-establish identity once, then retry.
+              try { await sb.auth.refreshSession(); } catch (_) {}
+            } else {
+              state.saveState.set(barId, 'error'); paintSave(barId, e.message);
+              continue;
+            }
+          }
+          if (!state.pending.has(barId)) state.pending.set(barId, payload);
+          state.saveState.set(barId, 'retrying'); paintSave(barId);
+          setOnline(false);
+          await sleep(state.backoff);
+          state.backoff = Math.min(state.backoff * 2, 15000);
+        }
+      }
+    } finally {
+      state.flushing = false;
+      if (state.pending.size) flush();
+    }
+  }
+
+  function paintSave(barId, msg) {
+    const card = document.querySelector(`[data-card="${barId}"]`); if (!card) return;
+    const el = card.querySelector('[data-save]');
+    const s = state.saveState.get(barId) || 'idle';
+    el.className = 'save ' + s;
+    const check = '<svg aria-hidden="true"><use href="#check"/></svg>';
+    el.innerHTML = s === 'saved' ? `${check}Score saved`
+      : s === 'saving' ? 'Saving…'
+      : s === 'retrying' ? 'Not saved yet · retrying'
+      : s === 'error' ? `Couldn't save${msg ? ' · ' + esc(msg) : ''}`
+      : '';
+  }
+
+  function setOnline(on) {
+    if (state.online === on) return;
+    state.online = on;
+    $('conn').classList.toggle('show', !on);
+    $('live-pill').classList.toggle('off', !on);
+    if (on) { flush(); refreshAggregates(); }
+  }
+  window.addEventListener('online', () => { setOnline(true); flush(); });
+  window.addEventListener('offline', () => setOnline(false));
+  window.addEventListener('beforeunload', (e) => {
+    if (state.pending.size || [...state.saveState.values()].some((s) => s === 'saving' || s === 'retrying')) {
+      e.preventDefault(); e.returnValue = '';
+    }
+  });
+
+  // ---------- aggregates (views expose only averages/counts) ----------
+  let refreshTimer = null, refreshing = false, refreshAgain = false;
+  function scheduleRefresh() { clearTimeout(refreshTimer); refreshTimer = setTimeout(refreshAggregates, 250); }
+
+  async function refreshAggregates() {
+    if (!state.participant) return;
+    if (refreshing) { refreshAgain = true; return; }
+    refreshing = true;
+    try {
+      const [barsQ, peopleQ, settingsQ] = await Promise.all([
+        sb.from('bar_leaderboard').select('bar_id, name, stop_number, avg_score, avg_exact, rating_count'),
+        sb.from('participant_leaderboard').select('participant_id, display_name, avg_score, avg_exact, bars_rated'),
+        sb.from('crawl_settings').select('results_revealed').eq('id', 1).maybeSingle(),
+      ]);
+      if (barsQ.error) throw barsQ.error;
+      if (peopleQ.error) throw peopleQ.error;
+      state.leaderboard.bars = sortBars(barsQ.data || []);
+      state.leaderboard.people = sortPeople(peopleQ.data || []);
+      renderLeaderboard();
+      const revealed = !!settingsQ.data?.results_revealed;
+      const wasRevealed = state.revealed;
+      state.revealed = revealed;
+      $('tab-results').hidden = !revealed;
+      if (revealed) {
+        const { data, error } = await sb.rpc('get_final_results');
+        if (!error) { state.results = data; renderResults(); }
+        if (!wasRevealed && state.tab !== 'results') setTab('results');
+      } else if (wasRevealed && state.tab === 'results') { setTab('leaderboard'); }
+      setOnline(true);
+    } catch (e) {
+      console.warn('refresh failed', e);
+      if (!(e && e.code)) setOnline(false);
+    } finally {
+      refreshing = false;
+      if (refreshAgain) { refreshAgain = false; refreshAggregates(); }
+    }
+  }
+
+  function sortBars(rows) {
+    return rows.slice().sort((a, b) => {
+      const aa = a.rating_count ? Number(a.avg_exact) : -1, bb = b.rating_count ? Number(b.avg_exact) : -1;
+      if (bb !== aa) return bb - aa;
+      if (b.rating_count !== a.rating_count) return b.rating_count - a.rating_count;
+      return a.name.localeCompare(b.name);
+    });
+  }
+  function sortPeople(rows) {
+    return rows.slice().sort((a, b) => {
+      const aa = a.bars_rated ? Number(a.avg_exact) : -1, bb = b.bars_rated ? Number(b.avg_exact) : -1;
+      if (bb !== aa) return bb - aa;
+      if (b.bars_rated !== a.bars_rated) return b.bars_rated - a.bars_rated;
+      return a.display_name.localeCompare(b.display_name);
+    });
+  }
+
+  function renderLeaderboard() {
+    const bars = state.leaderboard.bars, people = state.leaderboard.people;
+    const anyRated = bars.some((b) => b.rating_count > 0);
+    $('bars-rows').innerHTML = bars.length ? bars.map((b, i) => {
+      const leader = anyRated && i === 0 && b.rating_count > 0;
+      const n = b.rating_count;
+      return `<div class="row ${leader ? 'leader' : ''}">
+        <div class="rank">${i + 1}</div>
+        <div class="name"><b>${leader ? '<svg class="trophy" aria-label="Leader"><use href="#trophy"/></svg>' : ''}<span>${esc(b.name)}</span></b><small>Stop ${b.stop_number} · ${n} ${n === 1 ? 'rating' : 'ratings'}</small></div>
+        <div class="avg ${n ? '' : 'na'}">${n ? fmt1(b.avg_score) : '—'}<small>${n ? 'out of 10' : 'no ratings'}</small></div>
+      </div>`;
+    }).join('') : '<p class="empty">Loading…</p>';
+
+    const rated = people.filter((p) => p.bars_rated > 0);
+    const unrated = people.filter((p) => !p.bars_rated);
+    $('people-rows').innerHTML = (rated.length ? rated.map((p, i) => {
+      const me = p.participant_id === state.participant.id;
+      return `<div class="row">
+        <div class="rank">${i + 1}</div>
+        <div class="name"><b><span>${esc(p.display_name)}${me ? ' <small style="font-family:var(--sans);font-size:10px;color:var(--gold);letter-spacing:.1em">YOU</small>' : ''}</span></b><small>${p.bars_rated} of ${state.bars.length} bars rated</small></div>
+        <div class="avg">${fmt1(p.avg_score)}<small>avg</small></div>
+      </div>`;
+    }).join('') : '<p class="empty">No one has rated a pint yet. Be the first.</p>')
+      + (unrated.length ? `<p class="empty">Signed up, not yet rated: ${unrated.map((p) => esc(p.display_name)).join(', ')}</p>` : '');
+  }
+
+  // ---------- results ----------
+  function renderResults() {
+    const r = state.results, root = $('panel-results');
+    if (!r) { root.innerHTML = '<div class="waiting"><svg class="pint" viewBox="0 0 120 180"><use href="#pint-glass"/></svg><p>Results are being tallied…</p></div>'; return; }
+    const best = r.best_bar;
+    const pints = r.best_pints || [], critics = r.critics || [], lb = r.leaderboard || [];
+    root.innerHTML = `
+      <div class="hero">
+        <canvas class="confetti" aria-hidden="true"></canvas>
+        <svg class="trophy-big" aria-hidden="true"><use href="#trophy"/></svg>
+        <span class="eyebrow">Best Guinness of the crawl</span>
+        ${best ? `<h2>${esc(best.name)}</h2><div class="big">${fmt1(best.avg_score)}</div><span class="sub">average · ${best.rating_count} ${best.rating_count === 1 ? 'rating' : 'ratings'} · stop ${best.stop_number}</span>` : '<h2>No ratings yet</h2>'}
+      </div>
+      <div class="panel">
+        <span class="eyebrow">Best individual pint</span>
+        ${pints.length ? pints.map((p) => `<div class="pint-line"><div><b>${esc(p.display_name)}</b><div class="at">at ${esc(p.bar_name)}</div>${p.comment ? `<p class="quote">“${esc(p.comment)}”</p>` : ''}</div><span class="sc">${p.score}</span></div>`).join('') : '<p class="empty">No pints rated yet.</p>'}
+        ${pints.length > 1 ? '<p class="hint" style="margin:0">Tied at the top, listed in the order they were poured.</p>' : ''}
+      </div>
+      <div class="panel">
+        <span class="eyebrow">Most dedicated critic</span>
+        ${critics.length ? critics.map((c) => `<div class="pint-line"><div><b>${esc(c.display_name)}</b><div class="at">average ${fmt1(c.avg_score)}</div></div><span class="sc">${c.bars_rated}<small style="font-family:var(--sans);font-size:11px;color:var(--gray)"> / ${state.bars.length} bars</small></span></div>`).join('') : '<p class="empty">Nobody yet.</p>'}
+      </div>
+      <div class="panel">
+        <span class="eyebrow">The leaderboard</span>
+        ${lb.map((b, i) => `<div class="pint-line"><div><b>${i + 1}. ${esc(b.name)}</b><div class="at">${b.rating_count} ${b.rating_count === 1 ? 'rating' : 'ratings'}</div></div><span class="sc">${b.rating_count ? fmt1(b.avg_score) : '—'}</span></div>`).join('')}
+      </div>`;
+    confetti(root.querySelector('canvas'));
+  }
+
+  function confetti(canvas) {
+    if (!canvas || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ctx = canvas.getContext('2d'); const host = canvas.parentElement;
+    const resize = () => { canvas.width = host.clientWidth; canvas.height = host.clientHeight; }; resize();
+    const colors = ['#D5AD55', '#F3EBDD', '#702D32', '#687B51'];
+    const ps = Array.from({ length: 70 }, () => ({ x: Math.random() * canvas.width, y: -10 - Math.random() * canvas.height, r: 2 + Math.random() * 3, c: colors[(Math.random() * colors.length) | 0], v: 0.6 + Math.random() * 1.2, w: Math.random() * 6.28 }));
+    let t0 = performance.now();
+    (function frame(now) {
+      const dt = (now - t0) / 16; t0 = now;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of ps) {
+        p.y += p.v * dt; p.w += 0.05 * dt; p.x += Math.sin(p.w) * 0.6;
+        if (p.y < canvas.height + 10) alive = true;
+        ctx.globalAlpha = 0.9; ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.28); ctx.fill();
+      }
+      if (alive && now - t0 < 12000) requestAnimationFrame(frame); else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    })(t0);
+  }
+
+  // ---------- realtime: a content-free ping from a DB trigger → refetch aggregates ----------
+  let channel = null, pollTimer = null;
+  function startRealtime() {
+    if (channel) return;
+    channel = sb.channel('crawl')
+      .on('broadcast', { event: 'changed' }, () => scheduleRefresh())
+      .subscribe((status) => { if (status === 'SUBSCRIBED') scheduleRefresh(); });
+    pollTimer = setInterval(() => { if (document.visibilityState === 'visible') refreshAggregates(); }, 20000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { refreshAggregates(); flush(); } });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

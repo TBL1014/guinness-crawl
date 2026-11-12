@@ -223,7 +223,8 @@ const SUPABASE_ANON_KEY = "sb_publishable_GTkHds_s0hxu0bfOuMmi2Q_wGqxyDzH";
     const { data: isOrg, error } = await sb.rpc('is_organizer');
     if (error || !isOrg) { await sb.auth.signOut(); showLogin('This account is not an organizer.'); return; }
     $('view-login').hidden = true; $('view-dash').hidden = false;
-    const url = location.origin + location.pathname.replace(/\/organizer\/?$/, '').replace(/organizer\.html$/, 'index.html');
+    // Participant link = this page's folder (…/guinness-crawl/), never the organizer page itself.
+    const url = location.origin + location.pathname.replace(/organizer(\.html)?\/?$/, '');
     $('share-url').value = url;
     try { $('qr').innerHTML = ''; new QRCode($('qr'), { text: url, width: 156, height: 156, colorDark: '#101110', colorLight: '#F3EBDD', correctLevel: QRCode.CorrectLevel.M }); } catch (_) {}
     await refresh();

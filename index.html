@@ -104,9 +104,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 }
 .topbar-inner { display: flex; flex-direction: column; gap: 10px; padding-block: 12px 0; }
 .brand { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.brand h1 { font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand h1 { font-size: clamp(13px, 4.1vw, 20px); letter-spacing: 0.06em; text-transform: uppercase; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .brand h1 span { color: var(--gold); }
-.who { font-size: 12px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+.who { flex: none; font-size: 12px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 48%; }
 .who button { background: none; border: 0; padding: 0; color: var(--gray); text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
 .who button:hover { color: var(--cream); }
 .tabs { display: flex; gap: 4px; }
@@ -368,9 +368,15 @@ const SUPABASE_ANON_KEY = "sb_publishable_GTkHds_s0hxu0bfOuMmi2Q_wGqxyDzH";
   $('tab-results').onclick = () => setTab('results');
 
   // ---------- auth / identity ----------
+  // A stored session can point at a user that no longer exists (e.g. the organizer wiped test
+  // users). Verify it with the server once; if it is dead, drop it and start a fresh identity.
   async function ensureSession() {
     const { data: { session } } = await sb.auth.getSession();
-    if (session) return session;
+    if (session) {
+      const { error } = await sb.auth.getUser();
+      if (!error) return session;
+      try { await sb.auth.signOut({ scope: 'local' }); } catch (_) {}
+    }
     const { data, error } = await sb.auth.signInAnonymously();
     if (error) throw error;
     return data.session;
@@ -382,21 +388,21 @@ const SUPABASE_ANON_KEY = "sb_publishable_GTkHds_s0hxu0bfOuMmi2Q_wGqxyDzH";
     return data;
   }
 
+  // On first open we don't sign in until the user taps START; returning devices already have a session.
   async function boot() {
     try {
-      const session = await ensureSessionQuiet();
+      const { data: { session } } = await sb.auth.getSession();
       if (session) {
-        state.userId = session.user.id;
-        const p = await loadParticipant();
-        if (p) { state.participant = p; await enterApp(); return; }
+        const { error } = await sb.auth.getUser();
+        if (error) { try { await sb.auth.signOut({ scope: 'local' }); } catch (_) {} }
+        else {
+          state.userId = session.user.id;
+          const p = await loadParticipant();
+          if (p) { state.participant = p; await enterApp(); return; }
+        }
       }
     } catch (e) { console.warn('boot', e); }
     show('view-welcome');
-  }
-  // On first open we don't sign in until the user taps START; returning devices already have a session.
-  async function ensureSessionQuiet() {
-    const { data: { session } } = await sb.auth.getSession();
-    return session;
   }
 
   $('btn-start').onclick = async () => {
@@ -571,7 +577,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_GTkHds_s0hxu0bfOuMmi2Q_wGqxyDzH";
           const { error } = await sb.from('ratings').upsert(row, { onConflict: 'participant_id,bar_id' });
           if (error) throw error;
           if (!state.pending.has(barId)) { state.saveState.set(barId, 'saved'); paintSave(barId); }
-          state.backoff = 1000; setOnline(true);
+          state.backoff = 1000; setOnline(true); updateConn();
         } catch (e) {
           console.warn('save failed', e);
           if (isPermanent(e)) {
@@ -609,12 +615,20 @@ const SUPABASE_ANON_KEY = "sb_publishable_GTkHds_s0hxu0bfOuMmi2Q_wGqxyDzH";
       : '';
   }
 
+  function updateConn() {
+    const queued = state.pending.size > 0 || [...state.saveState.values()].some((s) => s === 'retrying');
+    const show = !state.online || queued;
+    $('conn').classList.toggle('show', show);
+    $('conn-text').textContent = !state.online
+      ? 'No connection. Your scores are queued and will save automatically.'
+      : 'A score is still saving. It will retry automatically; keep this page open.';
+    $('live-pill').classList.toggle('off', !state.online);
+  }
   function setOnline(on) {
-    if (state.online === on) return;
+    const changed = state.online !== on;
     state.online = on;
-    $('conn').classList.toggle('show', !on);
-    $('live-pill').classList.toggle('off', !on);
-    if (on) { flush(); refreshAggregates(); }
+    updateConn();
+    if (changed && on) { flush(); refreshAggregates(); }
   }
   window.addEventListener('online', () => { setOnline(true); flush(); });
   window.addEventListener('offline', () => setOnline(false));
